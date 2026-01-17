@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 
 export default function HomeScreen() {
@@ -24,18 +24,6 @@ export default function HomeScreen() {
     );
   }
 
-  // Photo preview screen
-  if (photoUri) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.previewText}>Photo captured</Text>
-        <TouchableOpacity style={styles.retakeButton} onPress={() => setPhotoUri(null)}>
-          <Text style={{ color: 'white' }}>Retake</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
   // Camera screen
   const takePhoto = async () => {
     if (!cameraRef.current) return;
@@ -44,15 +32,33 @@ export default function HomeScreen() {
     console.log('Photo URI:', photo.uri);
   };
 
+  const uploadPhoto = async () => {
+    if (!photoUri) return;
+    // Implement upload logic here
+    console.log('Uploading photo:', photoUri);
+  }
+
   return (
     <View style={styles.container}>
-      <CameraView ref={cameraRef} style={styles.camera} facing={"back"}>
-        <View style={styles.captureContainer}>
-          <TouchableOpacity style={styles.captureButton} onPress={takePhoto} />
+      {photoUri ? (
+        <View style={styles.photoContainer}>
+          <Image source={{ uri: photoUri }} style={styles.photo} />
+          <View style={styles.photoButtonContainer}>
+            <TouchableOpacity style={styles.retakeButton} onPress={() => setPhotoUri(null)} />
+            <TouchableOpacity style={styles.uploadButton} onPress={uploadPhoto} />
+          </View>
         </View>
-      </CameraView>
+      ) : (
+        <CameraView ref={cameraRef} style={styles.camera} facing={"back"}>
+          <View style={styles.captureContainer}>
+            <TouchableOpacity style={styles.captureButton} onPress={takePhoto} />
+          </View>
+        </CameraView>
+      )}
     </View>
   );
+
+  
 }
 
 const styles = StyleSheet.create({
@@ -75,6 +81,36 @@ const styles = StyleSheet.create({
     borderRadius: 36,
     backgroundColor: 'white',
   },
+  retakeButton: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: 'red',
+  },
+  uploadButton: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: 'green',
+  },
+  photoContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  photo: {
+    flex: 1,
+    width: '100%',
+  },
+  photoButtonContainer: {
+    position: 'absolute',
+    bottom: 40,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
   center: {
     flex: 1,
     justifyContent: 'center',
@@ -90,13 +126,5 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     marginTop: 40,
-  },
-  retakeButton: {
-    position: 'absolute',
-    bottom: 40,
-    alignSelf: 'center',
-    backgroundColor: 'black',
-    padding: 12,
-    borderRadius: 8,
   },
 });

@@ -34,9 +34,28 @@ export default function HomeScreen() {
 
   const uploadPhoto = async () => {
     if (!photoUri) return;
-    // Implement upload logic here
-    console.log('Uploading photo:', photoUri);
-  }
+
+    console.log("Uploading photo...");
+
+    const formData = new FormData();
+    formData.append("image", {
+      uri: photoUri,
+      name: "photo.jpg",
+      type: "image/jpeg",
+    } as any);
+
+    const response = await fetch("http://10.0.0.3:3000/ocr", {
+      method: "POST",
+      body: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    const data = await response.json();
+    console.log("OCR TEXT:", data.text);
+};
+
 
   return (
     <View style={styles.container}>

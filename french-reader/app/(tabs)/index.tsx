@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { savePageToReading } from '@/lib/reading';
 
 export default function HomeScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -53,7 +54,10 @@ export default function HomeScreen() {
     });
 
     const data = await response.json();
+
     console.log("OCR TEXT:", data.text);
+
+    await savePageToReading(photoUri, data.text);
 };
 
 

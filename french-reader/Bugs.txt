@@ -1,0 +1,4 @@
+Bugs
+
+- Weird issue with the cover page back arrow not working some times. One way to reproduce: open readings. create reading. back out (works fine). then click back on the reading (back out) still works fine). then click on the reading again delete it (goes back to readings correctly). then i make a new reading and try and back out but i cant
+-

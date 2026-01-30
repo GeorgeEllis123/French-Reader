@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 
+import { createNewReading } from '@/lib/reading';
 import { loadReadings } from '@/lib/storage';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
+import { Ionicons } from '@expo/vector-icons';
 
 
 export default function TabTwoScreen() {
@@ -19,6 +21,19 @@ export default function TabTwoScreen() {
 
     fetchReadings();
   }, []);
+
+  const handleCreateReading = async () => {
+    const id = await createNewReading('Untitled Reading');
+
+    const updatedReadings = await loadReadings();
+    setReadings(updatedReadings);
+
+    router.push({
+      pathname: '/readings/[id]',
+      params: { id },
+    });
+  };
+
 
     return (
     <ThemedView style={{ flex: 1, padding: 16 }}>
@@ -51,6 +66,15 @@ export default function TabTwoScreen() {
           </TouchableOpacity>
         )}
       />
+
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={handleCreateReading}
+        activeOpacity={0.8}
+      >
+        <Ionicons name="add" size={32} color="white" />
+      </TouchableOpacity>
+
     </ThemedView>
   );
 }
@@ -67,4 +91,21 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#ccc',
   },
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    alignSelf: 'center',
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+
 });

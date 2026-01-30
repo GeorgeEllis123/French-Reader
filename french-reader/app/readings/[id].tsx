@@ -1,44 +1,127 @@
-import { useEffect, useState } from 'react';
-import { ScrollView, Image, StyleSheet } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { loadReadings } from '@/lib/storage';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
+import { deleteReading as deleteReadingFromStorage, setActiveReadingId } from '@/lib/storage';
+import { useEffect } from 'react';
+
+
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
+  
 
 
-export default function ReadingScreen() {
+export default function ReadingCoverScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const [reading, setReading] = useState<any>(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
-    const fetchReading = async () => {
-      const data = await loadReadings();
-      const r = data.find((r: any) => r.id === id);
-      setReading(r);
-    };
+    console.log('[ReadingCover] canGoBack:', navigation.canGoBack());
+  }, []);
 
-    fetchReading();
-  }, [id]);
+  const deleteReading = async () => {
+    await deleteReadingFromStorage(id);
+    console.log("Deleting reading with ID:", id);
+    router.push('/readings');
+  };
 
-  if (!reading) return <ThemedText>Loading...</ThemedText>;
+  const openReading = async () => {
+    setActiveReadingId(id as string);
+
+    router.push({
+      pathname: '/readings/[id]/reader',
+      params: { id },
+    });
+  };
+
 
   return (
-    <ScrollView style={{ flex: 1, padding: 16 }}>
-      <ThemedText type="title">{reading.title}</ThemedText>
-      {reading.pages.map((page: any) => (
-        <ThemedView key={page.id} style={{ marginVertical: 16 }}>
-          {page.imageUri && <Image source={{ uri: page.imageUri }} style={styles.image} />}
-          <ThemedText style={{ marginTop: 8 }}>{page.text}</ThemedText>
-        </ThemedView>
-      ))}
-    </ScrollView>
+    <ThemedView style={styles.container}>
+      <ThemedView style={styles.coverCard}>
+        <ThemedText type="title" style={styles.title}>
+          Untitled Reading
+        </ThemedText>
+
+        <ThemedText style={styles.meta}>
+          Created date, page count, etc.
+        </ThemedText>
+      </ThemedView>
+
+      <ThemedView style={styles.actions}>
+        <TouchableOpacity style={styles.primaryButton} onPress={openReading}>
+          <ThemedText style={styles.primaryButtonText}>
+            Open Reading
+          </ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.secondaryButton}>
+          <ThemedText>Edit Title</ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.dangerButton} onPress={deleteReading}>
+          <ThemedText style={styles.dangerText}>
+            Delete Reading
+          </ThemedText>
+        </TouchableOpacity>
+      </ThemedView>
+    </ThemedView>
   );
 }
-
 const styles = StyleSheet.create({
-  image: {
-    width: '100%',
-    height: 250,
-    borderRadius: 8,
+  container: {
+    flex: 1,
+    padding: 24,
+    justifyContent: 'space-between',
+  },
+
+  coverCard: {
+    marginTop: 80,
+    padding: 24,
+    borderRadius: 16,
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.05)',
+  },
+
+  title: {
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+
+  meta: {
+    opacity: 0.6,
+  },
+
+  actions: {
+    gap: 12,
+    marginBottom: 24,
+  },
+
+  primaryButton: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+
+  primaryButtonText: {
+    color: 'white',
+    fontWeight: '600',
+  },
+
+  secondaryButton: {
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.08)',
+  },
+
+  dangerButton: {
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,0,0,0.1)',
+  },
+
+  dangerText: {
+    color: '#C00',
+    fontWeight: '500',
   },
 });

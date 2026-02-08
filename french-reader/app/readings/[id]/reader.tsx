@@ -171,12 +171,6 @@ export default function ReadingScreen() {
         visible={actionSheetVisible}
         text={selectedSectionText}
         onClose={() => setActionSheetVisible(false)}
-        onTranslate={() => {
-          console.log('Translate:', selectedSectionText);
-        }}
-        onGrammar={() => {
-          console.log('Grammar:', selectedSectionText);
-        }}
       />
 
 

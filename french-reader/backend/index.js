@@ -12,7 +12,6 @@ app.use(express.json());
 
 const upload = multer({ dest: "uploads/" });
 
-// Create Vision client using your service account key
 const client = new vision.ImageAnnotatorClient({
   keyFilename: "google-vision-key.json",
 });
